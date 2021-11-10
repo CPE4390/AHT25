@@ -3,7 +3,7 @@
 #include "LCD.h"
 #include "AHT25.h"
 
-//RD5 = SCA
+//RD5 = SDA
 //RD6 = SCL
 //Need 4.7k pull-ups
 
@@ -13,7 +13,7 @@ void main(void) {
     lprintf(0, "AHT25");
     AHT25InitI2C();
     if (AHT25Init()) {
-        lprintf(0, "AHT25 Init'ed");
+        lprintf(0, "AHT25 started");
     } else {
         lprintf(0, "Init error");
         while (1);
@@ -26,7 +26,7 @@ void main(void) {
         } else {
             lprintf(1, "Error");
         }
-        __delay_ms(2000);
+        __delay_ms(1000);
     }
 }
 

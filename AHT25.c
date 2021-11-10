@@ -22,7 +22,6 @@ char AHT25Init(void) {
     }
     AHT25SoftReset();
     if (!AHT25IsCalibrated()) {
-        char status = 0;
         SSP2CON2bits.SEN = 1;
         while (SSP2CON2bits.SEN == 1);
         SSP2BUF = AHT25_DEVICE_ADDRESS << 1;
@@ -99,8 +98,7 @@ char AHT25ReadTempAndHumidity(int *temp, int *humidity) {
     while (SSP2STATbits.BF || SSP2STATbits.R_W);
     SSP2CON2bits.PEN = 1;
     while (SSP2CON2bits.PEN == 1);
-    __delay_ms(AHT25_MEASUREMENT_DELAY);
-    char delayCount = 100;
+    char delayCount = AHT25_MEASUREMENT_DELAY;
     while (AHT25IsBusy() && delayCount > 0) {
         __delay_ms(1);
         --delayCount;
@@ -133,13 +131,13 @@ char AHT25ReadTempAndHumidity(int *temp, int *humidity) {
     raw |= buffer[2];
     raw <<= 4;
     raw |= buffer[3] >> 4;
-    *humidity = (raw / 0x100000) * 100;
+    *humidity = (raw * 100) / 0x100000;  //0x100000 = 2^20
     raw = buffer[3] & 0x0f;
     raw <<= 8;
     raw |= buffer[4];
     raw <<= 8;
     raw |= buffer[5];
-    *temp = (raw / 0x100000) * 200 - 50;
+    *temp = ((raw * 200) / 0x100000) - 50;
     return chksumIsValid(buffer);
 }
 
